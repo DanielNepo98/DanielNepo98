@@ -1,0 +1,116 @@
+Task: Given a description of libraries and books available, plan which books to scan from which library 
+to _maximize the total score of all scanned books_, taking into account that each library needs to be 
+signed up before it can ship books.
+=============
+Initial questions:
+* Book variables? - length, lang? Text/images?
+*Library variables? - #books, other media, age? Scan volume / speed / quality?
+* what does score mean? Quantity? Is there valuable?
+* Signed up - with google books? Signup check
+* Is scanning from location, or need to ship there first?
+
+------------Variables:----------
+B different Books with IDs from 0 to B-1. Only need to scan each book once [scan book if present from same lib?
+or present in db]
+"Book described by one parameter: score awarded when book scanned"
+[describes set of all books in world, evidently. phew]
+[Format that seems nice: dict. Book IDs as keys, values are score. Check presence in keys?
+B < 10^6
+
+
+L different libraries with IDs from 0 to L-1.
+Library parameters: Set of books stored [hashmap? list?]
+_Time in days_ it taeks to sign library up for scanning
+Number of books that can be scanned _each day_ from the library once signed up
+
+Time:
+D days from day 0 to D-1 (last day which books can be shipped from scanning facility). 
+First signup can start on day 0.
+
+-------Processes--------
+
+Signup:
+Must be done before shiping possible. _Only one library at a time can go through this process;_ can only
+start when no other signup processes [are there unique ones?] are running.
+Libraries can be signed up in any order. Books can be scaned as soon as signup complete (first day after process)
+Books can be scanned in parallel from multiple libraries [1 signup process, multiple scan processes]
+
+Scanning:
+Shipping/scanning is flattened. Recall L vars: shipped/scanned per day. Ship/scan/return happens over 1 day.
+Single scanning facility that can scan unlimited # of books/day
+
+------Input---------
+Plaintext. ASCII only, lines denoted by \n; lines easily parseable cool. Values delimited by space ' '
+
+first line: int B, int L, int D
+second line: B ints, describing scores of books
+followed by L sections describing individual libraries
+Each library j has two lines:
+First is N(umber of books [meaning unique IDs?] in j), T (days it takes to finish signup for j), M (# of books shipped to scan/day)
+Second: N (ints describing Ids of books in library. Each ID listed at most once per library)
+
+
+-----Output------
+Line 1: Int A (# of libraries to sign up - not all need to sign up!)
+Subseuqently, describe each library _in the order that you want them to start the signup process_. Each library once
+Description contains 2 lines:
+	First: Y (ID of library), K (# of books to be scanned from Y)
+	Second: IDs of books to scan from k0, k1, _in order that they are scanned_, no duplicates
+	
+	
+=====Takeaways / objectives====
+REMEMBER: MAXIMIZE SCORE
+You can scan books from a signed-up library in any order!
+*working first, efficiency later!
+	*later: potentially keep track of most valuable library
+	
+Question: How store libraries? What characteristics?
+	Hash table of Libraries where Library ID serves as key,
+	the value is iterable set / array of Book IDs.
+
+Question: fitness function! How do we choose?
+	Number of books known
+	Time it takes to sign up
+	Rate of increase/shipping value
+	
+	Want to know? <Total score>
+	
+	Initial fitness function: Total score / time it takes to sign up?
+		Total books / booksperday = how many days to transfer everything
+		Want: score per day
+		Total score / days = score per day!
+	
+	*for later: have maximum acceptable time? Greedy function? Develop heuristic?
+	
+Perhaps: Fitness function first time, use highest value of fitness first
+	When signup process complete, run function again to determine new highest fitness value
+		BECAUSE: As signup occurs, scanning happens, which means value of library changes!
+	
+--------
+
+
+Note: Does not check values for score etc. Doesn't throw errors if bad	input
+
+Note: scoreeval and libseval go through whole list, even if present. Some inefficiency...
+
+Beware pass by object-reference. Means can't re-declare objects, only modify mutable ones.
+
+
+
+====Functions====
+OK: readIDs: IDs from line, stored in tuple. Return tuple for use in readinput
+OK: readinput: Read everything lol. Ret void
+libeval: Determine score/day for a given library. Return value for fitness
+	* Distinguish between books already scanned! There should be scanned dict
+	List of library IDs in order from highest to lowest scores
+
+
+printout: Put output in given format
+
+Main: Create dicts,
+
+	SCAN CYCLE IS BROKE
+		First map to new tuple works. 
+		Taking away from libdict entry works
+		Issue: Keeps adding something that should already be in scanned.values()
+
