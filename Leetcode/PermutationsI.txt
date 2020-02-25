@@ -1,0 +1,49 @@
+"Given a collection of distinct integers, return all possible permutations."
+	How is collection provided? Array / list?
+	All possible permutations of those unique elements
+	Potential solutions: 
+		Bruteforce, nested for loops. Exponential. Gross.
+		Nested mappings: mapping for each digit for successive possible digits. Factorial? Huge memory space
+		One more mapping for totals, in order to minimize space complexity?
+	
+		Memoization:
+			Hash table, with _permutations_ as keys, value some random counter.
+			Counters work on hashable objects!! Would allow use as key. For solution, run the keys through list(tuple)
+	
+	
+	Recursive solution: FindPerm(wholeset){FindPerm(wholeset-1)}
+		Input for method permute: list of elements. REturns list of lists	
+	
+
+
+Lessons:
+	Collections - "High Performance container datatypes"
+		https://docs.python.org/2/library/collections.html
+		namedtuple(typename, field_names) - Factory func for creating tuple subclasses with named fields
+			Factory - Returns a new object.
+			field_names is sequence of strings
+		deque - list-like container with fast appends and pops on either end; doubly-linked list
+			Declaration:
+				class collections.deque([iterable[, maxlen]])
+				maxlen not specified or is None, has arbitrary length
+				Empty if no iterable specified.
+				Pronounced deck. "Double-ended queue"
+			Appends and pops from either side are O(1), roughly same.	
+				append(x) / appendleft(x)
+				clear() - leaves all with len zero. 
+				count() - 
+				extend(iterable) / extendleft(iterable) - extend by appending elements from iterable argument
+				pop() / popleft()
+				remove(value) - remove first occurence of value. If not found, ValueError. O(n)
+				reverse() - O(n)?
+				rotate(n=positive to go right, neg to go left) - last element -> first, moves n over. If not empty, appendleft.
+			If bounded length full, then delete stuff from the deque on the end opposite of the append.
+				Similar to Unix tail filter; things where only most recent data is of interest. Cool
+			Why use over a list? Pops in lists are O(n); pop(0) and insert(0, v) are O(n)
+		Counter - dict subclass for counting hashable objects. Returns 0 if don't find obj, not keyerror
+		OrderedDict - dict subclass that remembers order entries were added
+		defaultdict
+
+	String manipulation: https://docs.python.org/2/library/string.html
+
+

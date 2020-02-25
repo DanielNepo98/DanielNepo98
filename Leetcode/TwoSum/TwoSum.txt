@@ -1,0 +1,205 @@
+"Given an array of integers, return indices of the two numbers such that they add up to a specific target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice."
+
+
+*Assumption: Solutions Exist
+Question: Do ints have to be positive?
+Can elements repeat?
+
+Initial solution:
+
+Find all sums, store in dict.
+	- via nested for loop
+
+Key would be the sum, value would be the tuples of numbers that work
+	- How do you prevent duplication? E.g. 2+7, and 7+2
+		- dict of all added elements? Keys of elements that have been added
+		- list the terms in order of size? Put tuple in order; requires an operation each time.
+		- higher space complexity: Add both tuples into list lol
+		- Alternatively: How do you check for the presence of elements in tuples? For future study.*
+...	
+
+Final resolution, after much headsmashing:
+Dict with values in the array serving as keys, indices as dict values.
+Allows quick search by value, which is useful for use of complement to identiy a value quickly
+	
+			
+
+Lessons:
+	Function annotation
+	https://www.python.org/dev/peps/pep-3107/
+		 def twoSum(self, nums: List[int], target: int) -> List[int]:
+		 -> indicates return type
+		 nums : List[int] is a declaration of type for num nums
+		 
+	
+	Don't forget that len() is function for length lol
+	
+	Dict things:
+		Initialize empty dict
+			adict = {}
+			https://www.accelebrate.com/blog/using-defaultdict-python
+				need to import like:
+				from collections import defaultdict
+				ice_cream = defaultdict(lambda: 'Vanilla')
+					lambda
+					https://www.w3schools.com/python/python_lambda.asp
+					Basically: an expression pass. So, for every possible value, pass 'NotPresent'
+				
+					
+			Some various initilaization: https://www.geeksforgeeks.org/python-initializing-dictionary-with-empty-lists/
+			
+			Check if key exists: https://www.geeksforgeeks.org/python-check-whether-given-key-already-exists-in-a-dictionary/
+				tl;dr dict.keys()
+				ditto dict.values()
+			*Other ways to iterate through dict: https://realpython.com/iterate-through-dictionary-python/
+			Can't find index in .keys() or .values(); They are view objects, not lists! 
+			
+			
+	Don't forget to def __init__(self):
+		In every class!!
+		Default constructor.1
+		
+	Difference between break and continue: Parent loop vs Iteration
+	
+	Different between tuples and lists:
+		Tuples immutable but hashable! Declared like: x = (1, 2)
+		Lists are modifiable. Declared like: x = [1, 2]
+		Can recast to list using list(tupleobject)
+		Unpacking: https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences
+		
+		
+	Try-catch: https://www.w3schools.com/python/python_try_except.asp
+		Notation:
+		try:
+			thing
+		except:
+			thing in response to error
+		finally:
+			Run regardless of output
+		
+============================
+		
+# Messy solution here; O(n^2) lol
+
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        # populate dict with all sums for all terms
+        sums = {}
+        for i in range(len(nums)):
+            for j in range(len(nums)):
+                # same element can't be used twice
+                if i == j:
+                    continue
+                # For uniform listing in dict / to prevent duplication, list elements in order of size
+                elif i < j:
+                    val = (i, j)
+                else:
+                    val = (j, i)
+
+                if val not in sums.values():
+                    sum = nums[i] + nums[j]
+                    sums[sum] = val
+    
+        return list(sums[target])
+
+
+# Cleaner Solution
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        # populate dict with all sums for all terms
+        sums = {}
+        for i in range(len(nums)):
+            for j in range(len(nums)):
+                # same element can't be used twice
+                if i == j:
+                    continue
+                if (i, j) in sums.values() or (j, i) in sums.keys(): 
+                    continue
+                # For uniform listing in dict / to prevent duplication, list elements in order of size
+                elif i < j:
+                    key = (i, j)
+                else:
+                    key = (j, i)
+
+                if key not in sums.keys():
+                    sum = nums[i] + nums[j]
+                    if sum == target:
+                        return list(key)
+                    sums[key] = sum
+        return -1
+		
+#Even cleaner solution lol
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        # Create dict: Keys indices, values actual values
+        pairs = {}
+        for i in range(len(nums)):
+            for j in range(len(nums)):
+                # same element can't be used twice
+                if i == j:
+                    continue
+                # For uniform listing in dict / to prevent duplication, list elements in order of size
+                elif i < j:
+                    key = (i, j)
+                else:
+                    key = (j, i)
+                
+                try:
+                    if pairs[key] == 0:
+                        print("boo")
+                except KeyError:
+                    val = (nums[i], nums[j])
+                    pairs[key] = val
+                else:
+                    continue
+                    
+        # Find sums of these terms, return indices when solution found
+        pairitems = pairs.items()
+        for key, value in pairitems:
+            sum = value[0] + value[1]
+            if  sum == target:
+                return list(key)
+        #Should only return if error
+        return pairitems
+		
+# Space complexity too big, so let's just make 1-pass hash table
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        # Create dict. Indices as _values_ in the map - allows easy search by value!
+        map = {}
+        for i in range(len(nums)):
+            #Test using complement: target minus array value. e.g. 9 - 2 = 7; if 7 exists, use index
+            complement = target - nums[i]
+            
+            # If the complement is present, check if not the same element, and then return indices
+            if complement in map.keys():
+                if complement != nums[i]:
+                    return [map[complement], i]
+                    # The dict's key being array value makes this last part elegant
+            
+            map[nums[i]] = i
+        
+
+# ACCEPTED!
+# Above fails on edge case of input [3,3]; same value but not same _element_! What if whole array is 3s?
+# The map will store the index of the last solution! Value reassigned when new index encountered. Just that one line needs to change
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        # Create dict. Indices as _values_ in the map - allows easy search by value!
+        map = {}
+        for i in range(len(nums)):
+            #Test using complement: target minus array value. e.g. 9 - 2 = 7; if 7 exists, find in map
+            complement = target - nums[i]
+            # If the complement is present, check if if the two indices are the same; if not same element, return
+            if complement in map.keys():
+                if map[complement] != i:
+                    return [map[complement], i]
+                    # The dict's key being array value makes this last part elegant
+
+            map[nums[i]] = i
+        
+    
+    
+        
