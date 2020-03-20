@@ -1,0 +1,102 @@
+===========
+#Jumping on clouds
+#Iterate through the list. A path MUST exist; therefore +2 or +1 is always possible at a given point. Draw it!
+
+import math
+import os
+import random
+import re
+import sys
+
+def jumpingOnClouds(c):
+    numclouds = len(c)
+    pathlen = 0
+    i = 0
+    while i < numclouds-2:
+        if c[i+2] == 0:
+            pathlen+=1
+            i += 2
+        elif c[i+1] == 0:
+            pathlen += 1
+            i += 1
+    i = numclouds - 1 - i
+    if i != 0:
+        pathlen+=1
+
+    return(pathlen)
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    n = int(input())
+
+    c = list(map(int, input().rstrip().split()))
+
+    result = jumpingOnClouds(c)
+
+    fptr.write(str(result) + '\n')
+
+    fptr.close()
+
+
+==========
+# Bubble sort exercise whee
+# Sort up to i!!!! So: Go all the way to the end, sort up to there, then get smaller. Guaranteed to deal with worst case.
+# There's no guarantee that start would be sorted.
+
+def countSwaps(a):
+  temp = -1
+  count = 0
+  for i in range(len(a)-1, 0, -1):
+    print("i:"+str(i))
+    j = 0
+    while j < i:
+      print(str(a)+"j:"+str(j)+" count:"+str(count))
+      if a[j] > a[j+1]:
+        temp = a[j]
+        a[j] = a[j+1]
+        a[j+1] = temp
+        count+=1
+      j += 1
+    print(str(a)+"j:"+str(j)+" count:"+str(count))
+  
+  print("Array is sorted in "+str(count)+" swaps.")
+  print("First Element: "+str(a[0]))
+  print("Last Element: "+str(a[len(a)-1]))
+-----  
+# For fun: Let's memoize
+# Consider best case: Zeroswaps. If no new swaps conducted after a full sweep, is sorted
+# Record last swaps. If no new swaps after a full runthrough, done!
+# Also includes implementation of random :)
+ 
+def countSwaps(a):
+  temp = -1
+  count = 0
+  for i in range(len(a)-1, 0, -1):
+    prevcount = count
+    print("i:"+str(i))
+    j = 0
+    while j < i:
+      print(str(a)+"j:"+str(j)+" count:"+str(count))
+      if a[j] > a[j+1]:
+        temp = a[j]
+        a[j] = a[j+1]
+        a[j+1] = temp
+        count+=1
+      j += 1
+    if count == prevcount:
+      break
+    print(str(a)+"j:"+str(j)+" count:"+str(count))
+  
+  print("Array is sorted in "+str(count)+" swaps.")
+  print("First Element: "+str(a[0]))
+  print("Last Element: "+str(a[len(a)-1]))
+            
+
+if __name__ == '__main__':
+    n = 15
+
+    a = random.sample(range(n),n)
+
+    countSwaps(a)
+=====
