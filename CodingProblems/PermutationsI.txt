@@ -1,3 +1,5 @@
+Notes from leetcode problem
+
 "Given a collection of distinct integers, return all possible permutations."
 	How is collection provided? Array / list?
 	All possible permutations of those unique elements
